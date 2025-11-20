@@ -62,7 +62,7 @@ const login = async (req: Request, res: Response): Promise<void> => {
       accessToken,
     });
 
-    logger.info('User registered successfully', user);
+    logger.info('User logged successfully', user);
   } catch (error) {
     res.status(500).json({
       code: 'ServerError',
@@ -70,7 +70,7 @@ const login = async (req: Request, res: Response): Promise<void> => {
       error: error,
     });
 
-    logger.error('Error during user registration', error);
+    logger.error('Error during user login', error);
   }
 };
 
