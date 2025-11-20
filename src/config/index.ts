@@ -1,5 +1,7 @@
 import dotenv from 'dotenv';
 
+import ms from 'ms';
+
 dotenv.config();
 
 const config = {
@@ -8,6 +10,11 @@ const config = {
   WHITELIST_ORIGINS: ['https://docs.blog-api.codewithsadee.com'],
   MONGO_URI: process.env.MONGO_URI,
   LOG_LEVEL: process.env.LOG_LEVEL || 'info',
+  JWT_ACCESS_TOKEN: process.env.JWT_ACCESS_SECRET!,
+  JWT_REFRESH_TOKEN: process.env.JWT_ACCESS_SECRET!,
+  ACCESS_TOKEN_EXPIRY: process.env.ACCESS_TOKEN_EXPIRY as ms.StringValue,
+  REFRESH_TOKEN_EXPIRY: process.env.REFRESH_TOKEN_EXPIRY as ms.StringValue,
+  WHITELIST_ADMINS_MAIL: ['gpdev@ik.me', 'guillaumeporez46@gmail.com'],
 };
 
 export default config;
