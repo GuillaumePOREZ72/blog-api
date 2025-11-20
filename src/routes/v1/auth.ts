@@ -5,6 +5,8 @@ import { body } from 'express-validator';
  * Controllers
  */
 import register from '@/controllers/v1/auth/register';
+import login from '@/controllers/v1/auth/login';
+
 /**
  * Middlewares
  */
@@ -48,6 +50,6 @@ router.post(
   register,
 );
 
-router.post('/login');
+router.post('/login', login);
 
 export default router;
