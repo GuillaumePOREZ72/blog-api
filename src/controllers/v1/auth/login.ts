@@ -70,7 +70,7 @@ const login = async (req: Request, res: Response): Promise<void> => {
       error: error,
     });
 
-    logger.error('Error during user login', error);
+    logger.error('Error during login', error);
   }
 };
 

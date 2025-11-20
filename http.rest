@@ -47,7 +47,7 @@ POST {{baseUrl}}/auth/login
 Content-Type: {{contentType}}
 
 {
-  "email": "randomuser@gmail.com",
+  "email": "randomuser2@gmail.com",
   "password": "azerty123"
 }
 
