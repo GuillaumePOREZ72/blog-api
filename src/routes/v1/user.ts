@@ -13,13 +13,15 @@ import authorize from '@/middlewares/authorize';
  */
 import getCurrentUser from '@/controllers/v1/user/get_current_user';
 import updateCurrentUser from '@/controllers/v1/user/update_current_user';
-
+import deleteCurrentUser from '@/controllers/v1/user/delete_current_user';
+import getAllUser from '@/controllers/v1/user/get_all_user';
+import getUser from '@/controllers/v1/user/get_user';
+import deleteUser from '@/controllers/v1/user/delete_user';
 
 /**
  * Models
  */
 import User from '@/models/user';
-import deleteCurrentUser from '@/controllers/v1/user/delete_current_user';
 
 const router = Router();
 
@@ -87,4 +89,39 @@ router.delete(
   authorize(['admin', 'user']),
   deleteCurrentUser,
 );
+
+router.get(
+  '/',
+  authenticate,
+  authorize(['admin']),
+  query('limit')
+    .optional()
+    .isInt({ min: 1, max: 50 })
+    .withMessage('Limit must be between 1 to 50'),
+  query('offset')
+    .optional()
+    .isInt({ min: 0 })
+    .withMessage('Offset must be a positive integer'),
+  validationError,
+  getAllUser,
+);
+
+router.get(
+  '/:userId',
+  authenticate,
+  authorize(['admin']),
+  param('userId').notEmpty().isMongoId().withMessage('Invalid user ID'),
+  validationError,
+  getUser,
+);
+
+router.delete(
+  '/:userId',
+  authenticate,
+  authorize(['admin']),
+  param('userId').notEmpty().isMongoId().withMessage('Invalid user ID'),
+  validationError,
+  deleteUser,
+);
+
 export default router;
