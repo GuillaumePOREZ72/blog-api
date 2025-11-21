@@ -11,6 +11,7 @@ import authorize from '@/middlewares/authorize';
 /**
  * Controllers
  */
+import createBlog from '@/controllers/v1/blog/create_blog';
 
 const router = Router();
 
