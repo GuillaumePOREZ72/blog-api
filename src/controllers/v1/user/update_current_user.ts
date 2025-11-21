@@ -13,16 +13,26 @@ import User from '@/models/user';
  */
 import type { Request, Response } from 'express';
 
-const getCurrentUser = async (
-  requestAnimationFrame: Request,
+const updateCurrentUser = async (
+  req: Request,
   res: Response,
 ): Promise<void> => {
+  const userId = req.userId;
+  const {
+    username,
+    email,
+    password,
+    first_name,
+    last_name,
+    website,
+    facebook,
+    instagram,
+    linkedin,
+    x,
+    youtube,
+  } = req.body;
+
   try {
-    const userId = requestAnimationFrame.userId;
-    const user = await User.findById(userId).select('-__v').lean().exec();
-    res.status(200).json({
-      user,
-    });
   } catch (error) {
     res.status(500).json({
       code: 'ServerError',
@@ -30,8 +40,8 @@ const getCurrentUser = async (
       error: error,
     });
 
-    logger.error('Error while getting current user', error);
+    logger.error('Error while updating current user', error);
   }
 };
 
-export default getCurrentUser;
+export default updateCurrentUser;
