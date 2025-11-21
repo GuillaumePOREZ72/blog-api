@@ -1,10 +1,16 @@
 import { Schema, model, Types } from 'mongoose';
 
+/**
+ * Token interface
+ */
 interface IToken {
   token: string;
   userId: Types.ObjectId;
 }
 
+/**
+ * Token schema
+ */
 const tokenSchema = new Schema<IToken>({
   token: {
     type: String,

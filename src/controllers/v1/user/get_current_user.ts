@@ -13,12 +13,9 @@ import User from '@/models/user';
  */
 import type { Request, Response } from 'express';
 
-const getCurrentUser = async (
-  requestAnimationFrame: Request,
-  res: Response,
-): Promise<void> => {
+const getCurrentUser = async (req: Request, res: Response): Promise<void> => {
   try {
-    const userId = requestAnimationFrame.userId;
+    const userId = req.userId;
     const user = await User.findById(userId).select('-__v').lean().exec();
     res.status(200).json({
       user,

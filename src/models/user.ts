@@ -4,7 +4,6 @@ import bcrypt from 'bcrypt';
 /**
  * Interface User
  */
-
 export interface IUser {
   username: string;
   email: string;
