@@ -6,7 +6,7 @@ import { logger } from '@/lib/winston';
 /**
  * Models
  */
-import blog from '@/models/blog';
+import Blog from '@/models/blog';
 
 /**
  * Types
@@ -43,7 +43,9 @@ const uploadBlogBanner = (method: 'post' | 'put') => {
 
     try {
       const { blogId } = req.params;
-      const blog = 
+      const blog = await Blog.findById(blogId).select('banner.publicId').exec();
+
+      const data = await uploadToCloudinary()
     } catch (error) {}
   };
 };
