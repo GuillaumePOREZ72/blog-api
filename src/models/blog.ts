@@ -92,4 +92,10 @@ const blogSchema = new Schema<IBlog>(
   },
 );
 
+blogSchema.pre('validate', function (next) {
+  if (this.title && !this.slug) {
+    this.slug = 
+  }
+})
+
 export default model<IBlog>('Blog', blogSchema)
