@@ -72,7 +72,7 @@ const uploadBlogBanner = (method: 'post' | 'put') => {
         height: data.height,
       };
 
-      logger.info('BLog banner uploaded to Cloudinary', {
+      logger.info('Blog banner uploaded to Cloudinary', {
         //blogId
         banner: newBanner,
       });

@@ -46,7 +46,7 @@ const createBlog = async (req: Request, res: Response): Promise<void> => {
     logger.info('New blog created', newBlog);
 
     res.status(201).json({
-      blog: newBlog,
+      blog: newBlog.toObject(),
     });
   } catch (error) {
     res.status(500).json({

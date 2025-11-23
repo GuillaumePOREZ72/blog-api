@@ -21,6 +21,7 @@ const router = Router();
 
 router.post(
   '/',
+  authenticate,
   authorize(['admin']),
   upload.single('banner_image'),
   uploadBlogBanner('post'),
