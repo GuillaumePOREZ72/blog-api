@@ -2,6 +2,7 @@
  * Custom modules
  */
 import { logger } from '@/lib/winston';
+import uploadToCloudinary from '@/lib/cloudinary';
 
 /**
  * Models
@@ -12,6 +13,7 @@ import Blog from '@/models/blog';
  * Types
  */
 import type { Request, Response, NextFunction } from 'express';
+import { UploadApiErrorResponse } from 'cloudinary';
 
 /**
  * Constants
@@ -42,11 +44,50 @@ const uploadBlogBanner = (method: 'post' | 'put') => {
     }
 
     try {
-      const { blogId } = req.params;
-      const blog = await Blog.findById(blogId).select('banner.publicId').exec();
+      //const { blogId } = req.params;
+      //const blog = await Blog.findById(blogId).select('banner.publicId').exec();
 
-      const data = await uploadToCloudinary()
-    } catch (error) {}
+      const data = await uploadToCloudinary(
+        req.file.buffer,
+        //blog?.publicId.replace('blog-api/', ''),
+      );
+
+      if (!data) {
+        res.status(500).json({
+          code: 'ServerError',
+          message: 'Internal server error',
+        });
+
+        logger.error('Error while uploading blog banner to cloudinary', {
+          //blogId,
+          //publicId: blog?.banner.publicId,
+        });
+        return;
+      }
+
+      const newBanner = {
+        publicId: data.public_id,
+        url: data.secure_url,
+        width: data.width,
+        height: data.height,
+      };
+
+      logger.info('BLog banner uploaded to Cloudinary', {
+        //blogId
+        banner: newBanner,
+      });
+
+      req.body.banner = newBanner;
+
+      next();
+    } catch (error: UploadApiErrorResponse | any) {
+      res.status(error.http_code).json({
+        code: error.http_code < 500 ? 'ValidationError' : error.name,
+        message: error.message,
+      });
+
+      logger.error('Error while uploading blog banner to Cloudinary', error);
+    }
   };
 };
 
