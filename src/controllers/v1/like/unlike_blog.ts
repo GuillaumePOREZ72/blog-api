@@ -15,11 +15,23 @@ import Like from '@/models/like';
  */
 import type { Request, Response } from 'express';
 
-const likeBlog = async (req: Request, res: Response): Promise<void> => {
+const unlikeBlog = async (req: Request, res: Response): Promise<void> => {
   const { blogId } = req.params;
   const { userId } = req.body;
 
   try {
+    const existingLike = await Like.findOne({ userId, blogId }).lean().exec();
+
+    if (!existingLike) {
+      res.status(404).json({
+        code: 'NotFound',
+        message: 'Like not found',
+      });
+      return;
+    }
+
+    await Like.deleteOne({ _id: existingLike._id });
+
     const blog = await Blog.findById(blogId).select('likesCount').exec();
 
     if (!blog) {
@@ -30,29 +42,16 @@ const likeBlog = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    const existingLike = await Like.findOne({ blogId, userId }).lean().exec();
-    if (existingLike) {
-      res.status(400).json({
-        code: 'BadRequest',
-        message: 'You already liked this blog',
-      });
-      return;
-    }
-
-    await Like.create({ blogId, userId });
-
-    blog.likesCount = (blog.likesCount || 0) + 1;
+    blog.likesCount = (blog.likesCount || 0) - 1;
     await blog.save();
 
-    logger.info('Blog liked successfully', {
+    logger.info('Blog unliked successfully', {
       userId,
       blogId: blog._id,
       likesCount: blog.likesCount,
     });
 
-    res.status(200).json({
-      likesCount: blog.likesCount,
-    });
+    res.sendStatus(204);
   } catch (error) {
     res.status(500).json({
       code: 'ServerError',
@@ -60,8 +59,8 @@ const likeBlog = async (req: Request, res: Response): Promise<void> => {
       error: error,
     });
 
-    logger.error('Error while liking blog', error);
+    logger.error('Error while unliking blog', error);
   }
 };
 
-export default likeBlog;
+export default unlikeBlog;
