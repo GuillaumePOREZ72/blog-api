@@ -12,7 +12,7 @@ import { logger } from '@/lib/winston';
 /**
  * Models
  */
-import blog from '@/models/blog';
+import Blog from '@/models/blog';
 
 /**
  * Types
@@ -35,7 +35,7 @@ const createBlog = async (req: Request, res: Response): Promise<void> => {
 
     const cleanContent = purify.sanitize(content);
 
-    const newBlog = await blog.create({
+    const newBlog = await Blog.create({
       title,
       content: cleanContent,
       banner,
