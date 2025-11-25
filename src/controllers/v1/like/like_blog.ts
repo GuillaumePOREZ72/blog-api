@@ -2,46 +2,56 @@
  * Custom modules
  */
 import { logger } from '@/lib/winston';
+import blog from '@/models/blog';
 
 /**
  * Models
  */
 import Blog from '@/models/blog';
-
+import Like from '@/models/like';
 
 /**
  * Types
  */
 import type { Request, Response } from 'express';
-import type { IBlog } from '@/models/blog';
 
-type BlogData = Pick<IBlog, 'title' | 'content' | 'banner' | 'status'>;
+const likeBlog = async (req: Request, res: Response): Promise<void> => {
+  const { blogId } = req.params;
+  const { userId } = req.body;
 
-/**
- * Purify the blog content
- */
-const window = new JSDOM('').window;
-const purify = DOMPurify(window);
-
-const createBlog = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { title, content, banner, status } = req.body as BlogData;
-    const userId = req.userId;
+    const blog = await Blog.findById(blogId).select('likeCount').exec();
 
-    const cleanContent = purify.sanitize(content);
+    if (!blog) {
+      res.status(404).json({
+        code: 'NotFound',
+        message: 'Blog not found',
+      });
+      return;
+    }
 
-    const newBlog = await Blog.create({
-      title,
-      content: cleanContent,
-      banner,
-      status,
-      author: userId,
+    const existingLike = await Like.findOne({ blogId, userId }).lean().exec();
+    if (existingLike) {
+      res.status(400).json({
+        code: 'BadRequest',
+        message: 'You already liked this blog',
+      });
+      return;
+    }
+
+    await Like.create({ blogId, userId });
+
+    blog.likesCount++;
+    await blog.save();
+
+    logger.info('Blog liked successfully', {
+      userId,
+      blogId: blog._id,
+      likesCount: blog.likesCount,
     });
 
-    logger.info('New blog created', newBlog);
-
-    res.status(201).json({
-      blog: newBlog.toObject(),
+    res.status(200).json({
+      likesCount: blog.likesCount,
     });
   } catch (error) {
     res.status(500).json({
@@ -50,8 +60,8 @@ const createBlog = async (req: Request, res: Response): Promise<void> => {
       error: error,
     });
 
-    logger.error('Error during blog creation', error);
+    logger.error('Error while liking blog', error);
   }
 };
 
-export default createBlog;
+export default likeBlog;

@@ -9,6 +9,7 @@ import authorize from '@/middlewares/authorize';
 /**
  * Controllers
  */
+import likeBlog from '@/controllers/v1/like/like_blog';
 
 const router = Router();
 
@@ -16,7 +17,7 @@ router.post(
   '/blog/:blogId',
   authenticate,
   authorize(['admin', 'user']),
-  likeBlog
-)
+  likeBlog,
+);
 
 export default router;
