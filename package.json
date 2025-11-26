@@ -4,7 +4,12 @@
   "description": "",
   "main": "dist/server.ts",
   "scripts": {
-    "dev": "nodemon"
+    "dev": "nodemon",
+    "build": "tsc",
+    "start": "node dist/server.js"
+  },
+  "_moduleAliases": {
+    "@": "dist"
   },
   "keywords": [],
   "author": "",
@@ -40,6 +45,7 @@
     "helmet": "^8.1.0",
     "jsdom": "^27.2.0",
     "jsonwebtoken": "^9.0.2",
+    "module-alias": "^2.2.3",
     "mongoose": "^8.20.0",
     "multer": "^2.0.2",
     "winston": "^3.18.3"

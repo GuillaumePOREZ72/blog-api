@@ -1,9 +1,16 @@
+/**
+ * Node modules
+ */
 import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import compression from 'compression';
 import helmet from 'helmet';
+import 'module-alias/register';
 
+/**
+ * Custom modules
+ */
 import config from '@/config';
 import limiter from '@/lib/express_rate_limit';
 import { connectToDatabase, disconnectFromDatabase } from '@/lib/mongoose';
@@ -56,7 +63,7 @@ app.use(limiter);
     await connectToDatabase();
     app.use('/api/v1', v1Routes);
     app.listen(config.PORT, () => {
-    logger.info(`Server running: http://localhost:${config.PORT}`);
+      logger.info(`Server running: http://localhost:${config.PORT}`);
     });
   } catch (error) {
     logger.error('Failed to start the server', error);
