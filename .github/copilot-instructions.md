@@ -11,7 +11,7 @@ This is a RESTful blog API built with Express.js, TypeScript, MongoDB (Mongoose)
 - `src/controllers/v1/` - Business logic organized by feature (auth, blog, comment, like, user)
 - `src/models/` - Mongoose schemas with built-in validation
 - `src/middlewares/` - Reusable middleware chain (authenticate → authorize → validationError)
-- `src/lib/` - External service integrations (JWT, Cloudinary, Winston logger, MongoDB)
+- `src/lib/` - External service integrations (JWT, Cloudinary, Winston logger, MongoDB, Swagger)
 
 ## Authentication & Authorization Flow
 
@@ -132,7 +132,49 @@ ACCESS_TOKEN_EXPIRY, REFRESH_TOKEN_EXPIRY,
 CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET
 ```
 
-**No test suite configured** - integration testing done via `http.rest` file (REST client).
+## API Documentation (Swagger/OpenAPI)
+
+The API is documented using Swagger/OpenAPI 3.0 with `swagger-jsdoc` and `swagger-ui-express`.
+
+**Configuration:** `src/lib/swagger.ts`
+
+**Access URLs:**
+
+- Local: `http://localhost:3000/api-docs/`
+- Production: `https://blog-api-9dch.onrender.com/api-docs/`
+
+**Documentation Pattern:**
+
+All routes are annotated with JSDoc comments using the `@openapi` tag:
+
+```typescript
+/**
+ * @openapi
+ * /auth/login:
+ *   post:
+ *     summary: Login user
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/LoginInput'
+ *     responses:
+ *       200:
+ *         description: Login successful
+ */
+router.post('/login', ...);
+```
+
+**Schemas defined in `swagger.ts`:**
+
+- User, SocialLinks, Blog, Banner, Comment, Like
+- RegisterInput, LoginInput, AuthResponse
+- ValidationError, AuthenticationError, ServerError
+- PaginatedBlogs, PaginatedUsers
+
+**When adding new routes:** Always add the corresponding `@openapi` annotation above the route definition.
 
 ## Security & Content Handling
 

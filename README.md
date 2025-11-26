@@ -16,6 +16,7 @@ Une API RESTful moderne pour gérer un blog, construite avec **Express.js**, **T
 - [Installation](#-installation)
 - [Configuration](#-configuration)
 - [Lancement](#-lancement)
+- [Documentation API](#-documentation-api)
 - [Endpoints API](#-endpoints-api)
 - [Authentification](#-authentification)
 - [Modèles de données](#-modèles-de-données)
@@ -33,6 +34,7 @@ Une API RESTful moderne pour gérer un blog, construite avec **Express.js**, **T
 - ☁️ **Upload d'images** - Intégration Cloudinary pour les bannières
 - 🧹 **Sanitization HTML** - Protection XSS avec DOMPurify
 - ⚡ **Performance** - Compression gzip, rate limiting, caching headers
+- 📚 **Documentation Swagger** - Interface OpenAPI interactive
 
 ## 🏗️ Architecture
 
@@ -50,6 +52,7 @@ src/
 │   ├── cloudinary.ts # Upload d'images
 │   ├── jwt.ts        # Gestion des tokens
 │   ├── mongoose.ts   # Connexion MongoDB
+│   ├── swagger.ts    # Configuration OpenAPI/Swagger
 │   └── winston.ts    # Logging
 ├── middlewares/      # Middlewares Express
 │   ├── authenticate.ts
@@ -114,6 +117,22 @@ npm run dev
 
 # L'API sera disponible sur http://localhost:3000
 ```
+
+## 📚 Documentation API
+
+L'API dispose d'une documentation interactive Swagger/OpenAPI accessible à :
+
+| Environnement  | URL                                            |
+| -------------- | ---------------------------------------------- |
+| **Local**      | `http://localhost:3000/api-docs/`              |
+| **Production** | `https://blog-api-9dch.onrender.com/api-docs/` |
+
+La documentation inclut :
+
+- 📋 Tous les endpoints avec leurs paramètres
+- 🔐 Schéma d'authentification Bearer JWT
+- 📊 Schémas des modèles de données
+- 🧪 Interface "Try it out" pour tester les requêtes
 
 ## 📡 Endpoints API
 
