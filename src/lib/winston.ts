@@ -5,11 +5,19 @@ import config from '@/config';
 const { combine, timestamp, json, errors, align, printf, colorize } =
   winston.format;
 
-// Define thr transports zrrzy to hold different logging transports
+// Define the transports array to hold different logging transports
 const transports: winston.transport[] = [];
 
-// If the app is not running in production, add a console transport
-if (config.NODE_ENV !== 'production') {
+// Add console transport for all environments
+if (config.NODE_ENV === 'production') {
+  // Production: JSON format for log aggregation services
+  transports.push(
+    new winston.transports.Console({
+      format: combine(timestamp(), json()),
+    }),
+  );
+} else {
+  // Development: colorized, human-readable format
   transports.push(
     new winston.transports.Console({
       format: combine(
