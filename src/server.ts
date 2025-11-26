@@ -6,6 +6,7 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import compression from 'compression';
 import helmet from 'helmet';
+import swaggerUi from 'swagger-ui-express';
 import 'module-alias/register';
 
 /**
@@ -15,7 +16,11 @@ import config from '@/config';
 import limiter from '@/lib/express_rate_limit';
 import { connectToDatabase, disconnectFromDatabase } from '@/lib/mongoose';
 import { logger } from '@/lib/winston';
+import { swaggerSpec } from '@/lib/swagger';
 
+/**
+ * Router
+ */
 import v1Routes from '@/routes/v1';
 
 import type { CorsOptions } from 'cors';
@@ -57,6 +62,16 @@ app.use(
 app.use(helmet());
 
 app.use(limiter);
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
+app.get('/', (req, res) => {
+  res.json({
+    message: 'Blog API is running',
+    version: 'v1',
+    documentation: '/api-docs',
+  });
+});
 
 (async () => {
   try {

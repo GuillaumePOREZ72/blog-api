@@ -23,6 +23,38 @@ import User from '@/models/user';
 
 const router = Router();
 
+/**
+ * @openapi
+ * /auth/register:
+ *   post:
+ *     summary: Register a new user
+ *     description: Creates a new user account. Admin role requires a whitelisted email address.
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/RegisterInput'
+ *     responses:
+ *       201:
+ *         description: User registered successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/AuthResponse'
+ *         headers:
+ *           Set-Cookie:
+ *             description: Refresh token cookie (httpOnly)
+ *             schema:
+ *               type: string
+ *       400:
+ *         description: Validation error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ValidationError'
+ */
 router.post(
   '/register',
   body('email')
@@ -54,6 +86,38 @@ router.post(
   register,
 );
 
+/**
+ * @openapi
+ * /auth/login:
+ *   post:
+ *     summary: Login user
+ *     description: Authenticates a user and returns access token. Refresh token is set in httpOnly cookie.
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/LoginInput'
+ *     responses:
+ *       200:
+ *         description: Login successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/AuthResponse'
+ *         headers:
+ *           Set-Cookie:
+ *             description: Refresh token cookie (httpOnly)
+ *             schema:
+ *               type: string
+ *       400:
+ *         description: Invalid credentials
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ValidationError'
+ */
 router.post(
   '/login',
   body('email')
@@ -96,6 +160,37 @@ router.post(
   login,
 );
 
+/**
+ * @openapi
+ * /auth/refresh-token:
+ *   post:
+ *     summary: Refresh access token
+ *     description: Uses the refresh token from cookie to generate a new access token.
+ *     tags: [Auth]
+ *     responses:
+ *       200:
+ *         description: New access token generated
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 accessToken:
+ *                   type: string
+ *                   description: New JWT access token
+ *       400:
+ *         description: Invalid or missing refresh token
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ValidationError'
+ *       401:
+ *         description: Refresh token expired or revoked
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/AuthenticationError'
+ */
 router.post(
   '/refresh-token',
   cookie('refreshToken')
@@ -107,5 +202,32 @@ router.post(
   refreshToken,
 );
 
+/**
+ * @openapi
+ * /auth/logout:
+ *   post:
+ *     summary: Logout user
+ *     description: Revokes the refresh token and clears the cookie.
+ *     tags: [Auth]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Logout successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Logged out successfully
+ *       401:
+ *         description: Not authenticated
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/AuthenticationError'
+ */
 router.post('/logout', authenticate, logout);
 export default router;

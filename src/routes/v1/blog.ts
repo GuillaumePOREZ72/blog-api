@@ -24,6 +24,63 @@ const upload = multer();
 
 const router = Router();
 
+/**
+ * @openapi
+ * /blogs:
+ *   post:
+ *     summary: Create a new blog post
+ *     description: Creates a new blog post. Requires admin role. Banner image is uploaded to Cloudinary.
+ *     tags: [Blogs]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - title
+ *               - content
+ *               - banner_image
+ *             properties:
+ *               title:
+ *                 type: string
+ *                 maxLength: 180
+ *                 description: Blog post title
+ *               content:
+ *                 type: string
+ *                 description: Blog post content (HTML allowed, will be sanitized)
+ *               banner_image:
+ *                 type: string
+ *                 format: binary
+ *                 description: Banner image file (max 2MB)
+ *               status:
+ *                 type: string
+ *                 enum: [draft, published]
+ *                 default: draft
+ *     responses:
+ *       201:
+ *         description: Blog created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Blog'
+ *       400:
+ *         description: Validation error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ValidationError'
+ *       401:
+ *         description: Not authenticated
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/AuthenticationError'
+ *       403:
+ *         description: Forbidden - Admin role required
+ */
 router.post(
   '/',
   authenticate,
@@ -45,6 +102,45 @@ router.post(
   createBlog,
 );
 
+/**
+ * @openapi
+ * /blogs:
+ *   get:
+ *     summary: Get all published blogs
+ *     description: Retrieves a paginated list of all published blog posts.
+ *     tags: [Blogs]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           maximum: 50
+ *           default: 10
+ *         description: Number of items per page
+ *       - in: query
+ *         name: offset
+ *         schema:
+ *           type: integer
+ *           minimum: 0
+ *           default: 0
+ *         description: Number of items to skip
+ *     responses:
+ *       200:
+ *         description: List of blogs
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/PaginatedBlogs'
+ *       401:
+ *         description: Not authenticated
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/AuthenticationError'
+ */
 router.get(
   '/',
   authenticate,
@@ -61,6 +157,57 @@ router.get(
   getAllBlogs,
 );
 
+/**
+ * @openapi
+ * /blogs/user/{userId}:
+ *   get:
+ *     summary: Get blogs by user
+ *     description: Retrieves a paginated list of blog posts created by a specific user.
+ *     tags: [Blogs]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: User ID (MongoDB ObjectId)
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           maximum: 50
+ *           default: 10
+ *         description: Number of items per page
+ *       - in: query
+ *         name: offset
+ *         schema:
+ *           type: integer
+ *           minimum: 0
+ *           default: 0
+ *         description: Number of items to skip
+ *     responses:
+ *       200:
+ *         description: List of user's blogs
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/PaginatedBlogs'
+ *       400:
+ *         description: Invalid user ID
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ValidationError'
+ *       401:
+ *         description: Not authenticated
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/AuthenticationError'
+ */
 router.get(
   '/user/:userId',
   authenticate,
@@ -78,6 +225,45 @@ router.get(
   getBlogsByUser,
 );
 
+/**
+ * @openapi
+ * /blogs/{slug}:
+ *   get:
+ *     summary: Get blog by slug
+ *     description: Retrieves a single blog post by its URL slug.
+ *     tags: [Blogs]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: slug
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Blog post slug
+ *         example: my-first-blog-post
+ *     responses:
+ *       200:
+ *         description: Blog post details
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Blog'
+ *       400:
+ *         description: Invalid slug
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ValidationError'
+ *       401:
+ *         description: Not authenticated
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/AuthenticationError'
+ *       404:
+ *         description: Blog not found
+ */
 router.get(
   '/:slug',
   authenticate,
@@ -87,6 +273,66 @@ router.get(
   getBlogBySlug,
 );
 
+/**
+ * @openapi
+ * /blogs/{blogId}:
+ *   put:
+ *     summary: Update a blog post
+ *     description: Updates an existing blog post. Requires admin role.
+ *     tags: [Blogs]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: blogId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Blog ID (MongoDB ObjectId)
+ *     requestBody:
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               title:
+ *                 type: string
+ *                 maxLength: 180
+ *                 description: Blog post title
+ *               content:
+ *                 type: string
+ *                 description: Blog post content
+ *               banner_image:
+ *                 type: string
+ *                 format: binary
+ *                 description: New banner image (optional)
+ *               status:
+ *                 type: string
+ *                 enum: [draft, published]
+ *     responses:
+ *       200:
+ *         description: Blog updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Blog'
+ *       400:
+ *         description: Validation error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ValidationError'
+ *       401:
+ *         description: Not authenticated
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/AuthenticationError'
+ *       403:
+ *         description: Forbidden - Admin role required
+ *       404:
+ *         description: Blog not found
+ */
 router.put(
   '/:blogId',
   authenticate,
@@ -107,6 +353,44 @@ router.put(
   updateBlog,
 );
 
+/**
+ * @openapi
+ * /blogs/{blogId}:
+ *   delete:
+ *     summary: Delete a blog post
+ *     description: Deletes a blog post and its associated banner image. Requires admin role.
+ *     tags: [Blogs]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: blogId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Blog ID (MongoDB ObjectId)
+ *     responses:
+ *       200:
+ *         description: Blog deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Blog deleted successfully
+ *       401:
+ *         description: Not authenticated
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/AuthenticationError'
+ *       403:
+ *         description: Forbidden - Admin role required
+ *       404:
+ *         description: Blog not found
+ */
 router.delete('/:blogId', authenticate, authorize(['admin']), deleteBlog);
 
 export default router;
