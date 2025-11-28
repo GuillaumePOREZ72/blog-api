@@ -43,6 +43,7 @@ const corsOptions: CorsOptions = {
       logger.warn(`CORS error: ${origin} is not allowed by CORS`);
     }
   },
+  credentials: true,
 };
 
 app.use(cors(corsOptions));
