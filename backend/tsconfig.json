@@ -2,19 +2,19 @@
   "compilerOptions": {
     "target": "es6",
     "module": "commonjs",
-    "rootDir": "backend/src",
+    "rootDir": "src",
     "baseUrl": "./",
-    "outDir": "backend/dist",
+    "outDir": "dist",
     "removeComments": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,
     "skipLibCheck": true,
     "paths": {
-      "@/*": ["backend/src/*"]
+      "@/*": ["src/*"]
     },
-    "typeRoots": ["backend/src/@types"]
+    "typeRoots": ["src/@types"]
   },
-  "include": ["backend/src/**/*"],
+  "include": ["src/**/*"],
   "exclude": ["node_modules"]
 }
