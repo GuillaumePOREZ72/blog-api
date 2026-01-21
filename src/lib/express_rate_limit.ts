@@ -7,7 +7,7 @@ const limiter = rateLimit({
   legacyHeaders: false,
   message: {
     error:
-      'You have sent too many requests in a given amount of time. PLease try again later.',
+      'You have sent too many requests in a given amount of time. Please try again later.',
   },
 });
 
